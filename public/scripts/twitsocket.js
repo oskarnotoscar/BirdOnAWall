@@ -27,21 +27,14 @@ $(document).ready(function () {
     });
 
     socket.on('stream', function (tweet) {
-                    if (lastTweet == "") {
-                        addTweet(tweet);
-                    } else if (!(lastTweet == 'undefined') && !(tweet.tweet.user.screen_name == lastTweet.tweet.user.screen_name)) {
-                        addTweet(tweet);
-                    }
-                    lastTweet = tweet;
-                });
+        addTweet(tweet);
+    });
 });
 
 $('#clear-list').click(function () {
     $('#tweetd').empty();
 });
 
-
-var lastTweet = "";
 function addTweet(tweet) {
     var cardhtml = ejs.render(`
         <div class="card">

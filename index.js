@@ -7,6 +7,8 @@ app.use(express.static('public'));
 var Twit = require('twit'); 
 var io = require('socket.io').listen(server);
 
+var tempTweet = ""; // Temporary holder for checking duplicates
+
 // Listen on port 8080
 server.listen(8080, function() {
   console.log("The server is running.");
@@ -37,8 +39,17 @@ io.sockets.on('connection', function (socket) {
             var stream = T.stream('statuses/filter', { track: watchlist }); 
 
             // Starting Twitter Stream
-            stream.on('tweet', function (tweet) { 
-                io.sockets.emit('stream', {'tweet': tweet});
+            stream.on('tweet', function (tweet) {
+                if (tempTweet == "") {
+                    // Check if its the first tweet
+                    io.sockets.emit('stream', {'tweet': tweet});
+                } else if (tempTweet.user.screen_name == tweet.user.screen_name) {
+                    // Not emitting the tweet as its a duplicate
+                } else {
+                    // Standard emit
+                    io.sockets.emit('stream', {'tweet': tweet});
+                }
+                tempTweet = tweet;
             });
 
             // Stop Twitter Stream when user clicks Stop
