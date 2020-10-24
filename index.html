@@ -6,9 +6,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
 <body>
+    <section class="hero is-info">
+        <div class="hero-body">
+          <div class="container">
+            <h1 class="title">
+              Realtime Twitter Feed
+            </h1>
+            <h2 class="subtitle">
+              Developed by Oskar Sherrah (n10261109)
+            </h2>
+          </div>
+        </div>
+      </section>
     <section class="section">
         <div class="container">
-            <div id="tweetd"></div>
+            <div class="field">
+                <div class="control">
+                  <input class="input" type="text" placeholder="#dogs, #cats" id="keywords">
+                </div>
+                <p class="help">Enter one or more hashtags</p>
+              </div>
+            <button class="button is-link" id="listen-toggle">Start</button>
+            <button class="button is-primary" id="clear-list">Reset</button>
+        </div>
+        <div class="container">
+          <br>
+          <div id="tweetd"></div>
         </div>
     </section>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js"></script>

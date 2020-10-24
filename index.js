@@ -7,16 +7,17 @@ app.use(express.static('public'));
 var Twit = require('twit'); 
 var io = require('socket.io').listen(server);
 
-server.listen(3000, function() {
+// Listen on port 8080
+server.listen(8080, function() {
   console.log("The server is running.");
 });
 
+// Render the index.html file on connection
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-var watchlist = ['#code, #dogs, #cats'];
-
+// Twitter Developer credentials, found in .env file
 var T = new Twit({
         consumer_key: process.env.CONSUMER_KEY,
         consumer_secret: process.env.CONSUMER_SECRET,
@@ -25,12 +26,25 @@ var T = new Twit({
         timeout_ms: 60 * 1000
 });
 
+// When the user connects to the server
 io.sockets.on('connection', function (socket) {
+    // Detected when the user has put in hashtag(s) and hit start
+    socket.on('some-key', function (key) {
+        // Clear the watchlist and add the hashtag(s)
+        var watchlist = [];
+        watchlist.push(key.keyword);
+        if (Array.isArray(watchlist) && watchlist.length > 0) {
+            var stream = T.stream('statuses/filter', { track: watchlist }); 
 
-    var stream = T.stream('statuses/filter', { track: watchlist }); 
+            // Starting Twitter Stream
+            stream.on('tweet', function (tweet) { 
+                io.sockets.emit('stream', {'tweet': tweet});
+            });
 
-    stream.on('tweet', function (tweet) { 
-        io.sockets.emit('stream', {'tweet': tweet}); 
+            // Stop Twitter Stream when user clicks Stop
+            socket.on('disconnect', (reason) => {
+                stream.stop();
+            })
+        }
     });
-  
-}); 
+});
